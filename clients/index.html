@@ -1,0 +1,140 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Socket.IO chat</title>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      body { font: 13px Helvetica, Arial; }
+      form { background: #000; padding: 3px; position: fixed; bottom: 0; width: 100%; }
+      form input { border: 0; padding: 10px; width: 90%; margin-right: .5%; }
+      form button { width: 9%; background: rgb(130, 224, 255); border: none; padding: 10px; }
+      #messages { list-style-type: none; margin: 0; padding: 0; }
+      #messages li { padding: 5px 10px; }
+      #messages li:nth-child(odd) { background: #eee; }
+    </style>
+    <link rel="icon" href="data:;base64,iVBORw0KGgo=">
+    <script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
+    <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
+    <link rel="stylesheet" type="text/css" href="http://www.jointjs.com/cms/downloads/joint.css"/>
+    <script src="http://www.jointjs.com/js/vendor/lodash/lodash.min.js"></script>
+    <script src="http://www.jointjs.com/js/vendor/backbone/backbone-min.js"></script>
+    <script src="http://www.jointjs.com/cms/downloads/joint.js"></script>
+    <script>
+    $( document ).ready(function() {
+      var socket = io();
+      function node(x, y, label) {
+
+        var cell = new joint.shapes.fsa.State({
+          position: { x: x, y: y },
+          size: { width: 60, height: 60 },
+          attrs: {
+            text : { text: label, fill: '#000000', 'font-weight': 'normal' },
+            'circle': {
+              fill: '#f6f6f6',
+              stroke: '#000000',
+              'stroke-width': 2
+            }
+          }
+        });
+        //graph.addCell(cell);
+        return cell;
+      }
+
+      function edge(source, target, label, vertices) {
+        var cell = new joint.shapes.fsa.Arrow({
+          source: { id: source.id },
+          target: { id: target.id },
+          labels: [{ position: 0.5, attrs: { text: { text: label || '', 'font-weight': 'bold' } } }],
+          vertices: vertices || []
+        });
+        graph.addCell(cell);
+        return cell;
+      }
+
+      top.graph = new joint.dia.Graph;
+      var paper = new joint.dia.Paper({
+        el: $('#myholder'),
+        width: 800,
+        height: 800,
+        model: graph
+      });
+      //var rect1 = node(100,30,"mybox");
+      //var rect2 = node(400,30,"mybox2");
+      //var edge1 = edge(rect1,rect2,"/");
+      paper.on('blank:pointerdblclick', function(eventName, cell) {
+            console.log(arguments[1],arguments[2]);
+            var xx = arguments[1];
+            var yy = arguments[2];
+            var newnode = node(xx,yy,'new node');
+            socket.emit("createnode",newnode);
+        });
+
+      paper.on('cell:pointerdblclick ', function(element) {
+        var currentCell = arguments[0].model;
+        var xx = arguments[2];
+        var yy = arguments[3];
+        var position = {
+          'x': xx,
+          'y': yy
+        };
+        socket.emit("nodeclicked",position)
+      });
+      graph.on('change:position',function(cell){
+        var currentcell = cell;
+        var xx = arguments[1].x;
+        var yy = arguments[1].y;
+        var tx = arguments[2].tx;
+        var ty = arguments[2].ty;
+        //console.log(xx,yy,tx,ty);
+        var position = {
+          x:xx,
+          y:yy
+        };
+        var data = {
+          node:currentcell,
+          position:position
+        };
+        socket.emit('nodemoved',data);
+      });
+      socket.on('nodemoved',function(data){
+        currentnode = graph.getCell(data.node.id);
+        currentnode.set("position",data.position);
+        //var tx = (data.position.x - currentnode.attributes.position.x);
+        //var ty = (data.position.y - currentnode.attributes.position.y);
+        //if(tx!=0 && ty!=0){
+        //  console.log(tx,ty);
+        //  currentnode.translate(tx,ty);
+        //}
+      });
+
+      socket.on('createnode',function(node){
+        console.log(node);
+        graph.addCell(node);
+      });
+
+
+    });
+    function init(){
+        var socket = io();
+        $('form').submit(function(){
+          socket.emit('chat message', $('#m').val());
+          $('#m').val('');
+          return false;
+        });
+        socket.on('chat message', function(msg){
+          $('#messages').append($('<li>').text(msg));
+        });
+        console.log("hi hi");
+
+      }
+
+
+
+    </script>
+  </head>
+  <body>
+    <div id="myholder">
+      <h1>Hellow</h1>
+    </div>
+  </body>
+</html>
