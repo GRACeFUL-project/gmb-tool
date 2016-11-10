@@ -1,0 +1,266 @@
+<!doctype html>
+<html lang = "en">
+   <head>
+      <meta charset = "utf-8">
+      <title>jQuery UI Tabs functionality</title>
+      
+      <script src = "js/jquery.js"></script>
+      <script src = "https://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
+      <link rel="stylesheet" type = "text/css" href = "bootstrap/css/bootstrap.min.css">
+      <link href = "css/joint.min.css" rel = "stylesheet">
+      <script src = "bootstrap/js/bootstrap.min.js"></script>
+      <script src = "js/lodash.js"></script>
+      <script src = "js/backbone.js"></script>
+      <script src = "js/joint.min.js"></script>
+      <script>
+
+      </script>
+      
+		
+      <script>
+         $(document).ready(function(){
+         	$("#right").hide();
+
+         	$(function () {
+         		var selectedNode = null;
+         		var source = null;
+         		var graph = new joint.dia.Graph;
+         		var paper = new joint.dia.Paper({
+         			el: $('#goalTree'),
+         			height: 500,
+         			width: 1000,
+         			model: graph
+         		});
+         		function node(x, y, label) {
+         			console.log("bye bye");
+         			var rect = new joint.shapes.basic.Rect({
+         				position: { x: x, y: y },
+         				size: { width: 100, height: 100 },
+         				attrs: { rect: { fill: 'blue' }, text: { text: "my", fill: 'white' } },
+         				rectType: 'Sub Goal',
+         				comment: 'some comment'
+         			});
+         			graph.addCell(rect);
+         			return rect;
+         		}
+         		$('#ok-button').on('click', function (e) {
+         				$("#right").hide();
+         				if(selectedNode.get('rectType') != $("#rectType").val())
+         				{
+         					if($("#rectType").val() == "Goal")
+         					{
+         						selectedNode.attr('rect/fill','green' )
+         					}
+         					if($("#rectType").val() == "Sub Goal")
+         					{
+         						selectedNode.attr('rect/fill','blue' )
+         					}
+         					if($("#rectType").val() == "Criteria")
+         					{
+         						selectedNode.attr('rect/fill','yellow' )
+         					}
+         				}
+         				selectedNode.attr('text/text',$("#name").val() );
+         				selectedNode.set('rectType',$("#rectType").val());
+         				selectedNode.set('comment',$("#comment").val());
+         				
+         				
+         			})
+         		function updateRight(currentCell){
+         			var name = currentCell.get('attrs').text.text;
+         			var rectType = currentCell.get('rectType');
+         			var comment = currentCell.get('comment');
+         			$("#name").val(name);
+         			$("#comment").val(comment);
+         			$("#rectType").val(comment);
+         		}
+
+         		
+
+         		function edge(source, target, label, vertices) {
+         			var link = new joint.dia.Link({
+         				source: { id: source.id },
+         				target: { id: target.id }
+         			});
+         			graph.addCell(link);
+         			return link;
+         		}
+         		paper.on('blank:pointerdblclick', function(evt, x, y) {
+         			var rect1 = node(x,y,"mybox");
+         		})
+         		paper.on('cell:pointerdblclick  ', function(cellview,evt, x, y) {
+         			var currentCell = cellview.model;
+         			selectedNode = currentCell;
+         			updateRight(currentCell)
+         			$("#right").show();
+         		});
+         		paper.on('cell:contextmenu  ', function(cellview,evt, x, y) {
+         			var currentCell = cellview.model;
+         			console.log(currentCell);
+         			evt.preventDefault();
+         			if(!currentCell.isLink())
+         			{
+         				if(source==null)
+         				{
+         					source=currentCell;
+         				}
+         				else{
+         					var newNode = edge(source,currentCell,"added");
+         					source = null;
+         				}
+         			}
+         		});
+         		
+         		
+         	});
+
+         	$('ul.tabs li').click(function(){
+         		var tab_id = $(this).attr('data-tab');
+         		$('ul.tabs li').removeClass('current');
+         		$('.tab-content').removeClass('current');
+         		$(this).addClass('current');
+         		$("#"+tab_id).addClass('current');
+         	})
+         	function arrayToTable(tableData) {
+         		var table = $('<table></table>');
+         		$(tableData).each(function (i, rowData) {
+         			var row = $('<tr></tr>');
+         			$(rowData).each(function (j, cellData) {
+         				row.append($('<td>'+cellData+'</td>'));
+         			});
+         			table.append(row);
+         		});
+         		return table;
+         	}
+         	
+         	})
+      </script>
+		
+      <style>
+      	.rightbar {
+      		color: #D5D5D5;
+      		border-radius: 0px;
+      		position: fixed;
+      		z-index: 2000;
+      		background-color: #41444A;
+      		padding: 15px;
+      		right: 0px;
+			top: 141px;
+			border: 3px transparent;
+			height: 500px;
+			width: 300px;	
+			overflow: auto;
+			transition: left .3s ease-in-out;
+			display: inline-block;
+			box-shadow: 0 4px 5px 0 rgba(0, 0, 0, .14), 0 1px 10px 0 rgba(0, 0, 0, .12), 0 2px 4px -1px rgba(0, 0, 0, .2);
+		}
+      	body{
+			margin-top: 0px;
+			font-family: 'Trebuchet MS', serif;
+			line-height: 1.6
+		}
+		.container{
+			width: 100%;
+			margin: 0 auto;
+		}
+		ul.tabs{
+			margin: 0px;
+			padding: 0px;
+			list-style: none;
+		}
+		ul.tabs li{
+			background: none;
+			color: #222;
+			display: inline-block;
+			padding: 10px 15px;
+			cursor: pointer;
+		}
+		ul.tabs li.current{
+			background: #ededed;
+			color: #222;
+		}
+		.tab-content{
+			display: none;
+			background: #ededed;
+			padding: 15px;
+		}
+		.tab-content.current{
+			display: inherit;
+		}
+		.coloredd{
+			background-color: red;
+		}
+      </style>
+   </head>
+
+<body>
+	<div class="container">
+	<ul class="tabs">
+		<li class="tab-link current" data-tab="tab-1">Stakeholder</li>
+		<li class="tab-link" data-tab="tab-2">Goal Tree</li>
+		<li class="tab-link" data-tab="tab-3">CLD Diagram</li>
+		<li class="tab-link" data-tab="tab-4">System Model</li>
+	</ul>
+
+	<div id="tab-1" class="tab-content current">
+		<table class="table table-inverse">
+			<thead>
+				<tr>
+					<th>#</th>
+					<th>Stakeholder</th>
+					<th>Participants</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<th scope="row">1</th>
+					<td>Stakeholder Group A</td>
+					<td>AA, AB, AC, AD</td>
+				</tr>
+				<tr>
+					<th scope="row">2</th>
+					<td>Stakeholder Group B</td>
+					<td>BA, BB, BC, BD, BD</td>
+				</tr>
+				<tr>
+					<th scope="row">3</th>
+					<td>Stakeholder Group C</td>
+					<td>CA, CB, CC, CD</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+	<div id="tab-2" class="tab-content">
+		<div class="coloredd">
+			<div id = "goalTree" style="background-color: #ffffff"></div>
+		</div>
+		<div id="right" class ="rightbar">
+			<form>
+				<div class="form-group">
+					<label for="name">Name:</label>
+      				<input type="text" class="form-control" id="name">
+      				<label for="rectType">Disabled select menu</label>
+      				<select id="rectType" class="form-control">
+      					<option>Goal</option>
+      					<option>Sub Goal</option>
+      					<option>Criteria</option>
+      				</select>
+					<label for="comment">Comment:</label>
+					<textarea class="form-control" rows="5" id="comment"></textarea>
+					<button type="button" id = "ok-button"class="btn btn-default">Done</button>
+				</div>
+			</form>
+		</div>
+	</div>
+	<div id="tab-3" class="tab-content">
+		Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
+	</div>
+	<div id="tab-4" class="tab-content">
+		Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+	</div>
+
+</div><!-- container -->
+		
+   </body>
+	
+</html>
