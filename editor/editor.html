@@ -2,7 +2,7 @@
 <html lang = "en">
    <head>
       <meta charset = "utf-8">
-      <title>jQuery UI Tabs functionality</title>
+      <title>GMB Tool</title>
       
       <script src = "js/jquery.js"></script>
       <script src = "https://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
@@ -20,6 +20,14 @@
       <script>
          $(document).ready(function(){
          	$("#right").hide();
+         	var data = [{"stakeholder":"stakeholder A","participant":"AA,AB,AC"},{"stakeholder":"stakeholder B","participant":"BA,BB,BC"},{"stakeholder":"stakeholder C","participant":"CA,CB,CC"}];
+         	var tr;
+         	for (var i = 0; i < data.length; i++) {
+         		tr = $('<tr/>');
+         		tr.append("<td>" + data[i].stakeholder + "</td>");
+         		tr.append("<td>" + data[i].participant + "</td>");
+         		$('#stakeholderTable').append(tr);
+         	}
 
          	$(function () {
          		var selectedNode = null;
@@ -72,8 +80,13 @@
          			var comment = currentCell.get('comment');
          			$("#name").val(name);
          			$("#comment").val(comment);
-         			$("#rectType").val(comment);
+         			$("#rectType").val(rectType);
+         			
          		}
+         		$('.selectpicker').on('change', function(){
+         			var selected = $(this).val();
+         			alert(selected);
+         		});
 
          		
 
@@ -132,6 +145,7 @@
          		});
          		return table;
          	}
+
          	
          	})
       </script>
@@ -203,32 +217,12 @@
 	</ul>
 
 	<div id="tab-1" class="tab-content current">
-		<table class="table table-inverse">
-			<thead>
-				<tr>
-					<th>#</th>
-					<th>Stakeholder</th>
-					<th>Participants</th>
-				</tr>
-			</thead>
-			<tbody>
-				<tr>
-					<th scope="row">1</th>
-					<td>Stakeholder Group A</td>
-					<td>AA, AB, AC, AD</td>
-				</tr>
-				<tr>
-					<th scope="row">2</th>
-					<td>Stakeholder Group B</td>
-					<td>BA, BB, BC, BD, BD</td>
-				</tr>
-				<tr>
-					<th scope="row">3</th>
-					<td>Stakeholder Group C</td>
-					<td>CA, CB, CC, CD</td>
-				</tr>
-			</tbody>
-		</table>
+		<table id = "stakeholderTable" class="table table-inverse">
+			<tr>
+        		<th>Stakeholder</th>
+        		<th>Participants</th>
+    		</tr>
+    	</table>
 	</div>
 	<div id="tab-2" class="tab-content">
 		<div class="coloredd">
@@ -240,7 +234,7 @@
 					<label for="name">Name:</label>
       				<input type="text" class="form-control" id="name">
       				<label for="rectType">Disabled select menu</label>
-      				<select id="rectType" class="form-control">
+      				<select id="rectType" class="selectpicker form-control">
       					<option>Goal</option>
       					<option>Sub Goal</option>
       					<option>Criteria</option>
@@ -248,6 +242,22 @@
 					<label for="comment">Comment:</label>
 					<textarea class="form-control" rows="5" id="comment"></textarea>
 					<button type="button" id = "ok-button"class="btn btn-default">Done</button>
+				
+
+				<table class="table table-bordered">
+					<thead>
+        				<tr>
+            				<th style="width: 33%;">Stakeholder</th>
+            				<th style="width: 33%;">Unit</th>
+        				</tr>
+    				</thead>
+    				<tbody class="clubbedfeebody">
+        				<tr data-feescount="0">
+            				<td><label placeholder="stakeholdername" name="properties[0][stakeholdername]" id="properties_0_stakeholdername">Stakeholder A</label></td>
+            				<td><input placeholder="unit" class="form-control" name="properties[0][unit]" id="properties_0_unit" type="text"/></td>
+        				</tr>
+    				</tbody>
+				</table>
 				</div>
 			</form>
 		</div>
